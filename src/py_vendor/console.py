@@ -14,8 +14,19 @@ logger = logging.getLogger(__name__)
 
 
 @click.group()
-def main():
-    logging.basicConfig(level=logging.INFO)
+@click.option(
+    "-v",
+    "--verbose",
+    count=True,
+    help="The logging verbosity: 0=WARNING (default), 1=INFO, 2=DEBUG"
+)
+def main(verbose):
+    if verbose >= 2:
+        logging.basicConfig(level=logging.DEBUG)
+    elif verbose == 1:
+        logging.basicConfig(level=logging.INFO)
+    else:
+        logging.basicConfig(level=logging.WARNING)
 
 
 @main.command()
