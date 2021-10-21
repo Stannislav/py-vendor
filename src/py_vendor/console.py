@@ -13,6 +13,24 @@ from py_vendor.run import do_vendor
 logger = logging.getLogger(__name__)
 
 
+def echo(msg):
+    click.secho(msg, fg="blue")
+
+
+def echo_warning(msg):
+    click.secho(msg, fg="yellow")
+
+
+def echo_error(msg):
+    click.secho(msg, fg="red")
+
+
+def echo_pair(key, value):
+    click.secho(key, fg="blue", nl=False)
+    click.echo(": ", nl=False)
+    click.secho(value, fg="green")
+
+
 @click.group()
 @click.option(
     "-v",
@@ -31,9 +49,7 @@ def main(verbose):
 
 @main.command()
 def version():
-    click.secho("Version", fg="blue", nl=False)
-    click.echo(": ", nl=False)
-    click.secho(py_vendor.__version__, fg="green")
+    echo_pair("Version", py_vendor.__version__)
 
 
 @main.command()
@@ -45,20 +61,26 @@ def run(config: str, name: str | None, force: bool):
         config = yaml.safe_load(fh.read())
 
     vendor_dir = config["params"]["vendor_dir"]
-    logger.info(f"target dir: %s", vendor_dir)
+    echo_pair(f"Target dir", vendor_dir)
     for vendor_name, cfg in config["vendors"].items():
         if name is not None and vendor_name != name:
             continue
         url = cfg.get("url")
         ref = cfg.get("ref")
-        logger.info("vendoring %s %s @ %s", vendor_name, url, ref)
+        echo_pair("Vendoring", f"{vendor_name} {url} @ {ref}")
         target = pathlib.Path(vendor_dir, vendor_name)
         if target.exists():
             if force:
+                echo_warning(
+                    f"Removing the directory {target.resolve().as_uri()} "
+                    f"(--force option present)"
+                )
                 shutil.rmtree(target)
             else:
-                raise RuntimeError(
-                    f'Target directory "{target.resolve().as_uri()}" not empty. '
-                    "Use -f to remove it."
+                echo_error(
+                    f"Target directory {target.resolve().as_uri()} not empty. "
+                    "Use the --force option to force overwriting."
                  )
+                continue
         do_vendor(url, target, ref, cfg.get("files"))
+    echo("Done.")
