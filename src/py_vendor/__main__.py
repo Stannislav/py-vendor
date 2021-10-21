@@ -1,3 +1,3 @@
-from py_vendor.console import run
+from py_vendor.console import main
 
-run()
+main()

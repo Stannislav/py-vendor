@@ -4,11 +4,11 @@ import py_vendor
 
 
 @click.group()
-def run():
-    pass
+def main():
+    print("Hello")
 
 
-@run.command()
+@main.command()
 def version():
     click.secho("Version", fg="blue", nl=False)
     click.echo(": ", nl=False)
