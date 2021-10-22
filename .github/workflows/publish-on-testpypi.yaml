@@ -1,0 +1,28 @@
+name: Publish to TestPyPI
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  build-and-publish:
+    name: Build and Publish on TestPyPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+#      - name: Set up python
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: 3.9
+#      - name: Install Poetry
+#        uses: snok/install-poetry@v1
+      - name: Bump to a dev version
+        run: |
+          poetry version patch
+          poetry version $(poetry version -s).dev$(date "+%Y%m%d%H%M")
+      - name: Build and Publish to TestPyPI
+        uses: JRubics/poetry-publish@v1.6
+        with:
+          pypi_token: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_name: "testpypi"
+          repository_url: "https://test.pypi.org/legacy/"
