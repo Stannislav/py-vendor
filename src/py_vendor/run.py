@@ -7,8 +7,6 @@ import shutil
 import subprocess
 import tempfile
 
-import yaml
-
 logger = logging.getLogger(__name__)
 
 
@@ -88,27 +86,3 @@ def do_vendor(
             dstdir.mkdir()
             for item in files:
                 copy_item(item, pathlib.Path(srcdir), dstdir)
-
-
-def main(force=True, name=None):
-    with open("dev/py-vendor.yaml") as fh:
-        config = yaml.safe_load(fh.read())
-
-    vendor_dir = config["params"]["vendor_dir"]
-    logger.info(f"target dir: %s", vendor_dir)
-    for vendor_name, cfg in config["vendors"].items():
-        if name is not None and vendor_name != name:
-            continue
-        url = cfg.get("url")
-        ref = cfg.get("ref")
-        logger.info("vendoring %s %s @ %s", vendor_name, url, ref)
-        target = pathlib.Path(vendor_dir, vendor_name)
-        if target.exists():
-            if force:
-                shutil.rmtree(target)
-            else:
-                raise RuntimeError(
-                    f'Target directory "{target.resolve().as_uri()}" not empty. '
-                    "Use -f to remove it."
-                 )
-        do_vendor(url, target, ref, cfg.get("files"))
