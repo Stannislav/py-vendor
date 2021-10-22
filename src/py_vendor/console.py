@@ -83,4 +83,12 @@ def run(config: str, name: str | None, force: bool):
                  )
                 continue
         do_vendor(url, target, ref, cfg.get("files"))
+
+        # Touch
+        for filename in cfg.get("touch", []):
+            path = target / filename
+            logger.info("touching %s", path)
+            path.parent.mkdir(exist_ok=True, parents=True)
+            path.touch()
+
     echo("Done.")
