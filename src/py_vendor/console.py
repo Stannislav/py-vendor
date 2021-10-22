@@ -82,7 +82,7 @@ def run(config: str, name: str | None, force: bool):
                     "Use the --force option to force overwriting."
                  )
                 continue
-        do_vendor(url, target, ref, cfg.get("files"))
+        do_vendor(url, target, ref, cfg.get("copy"))
 
         # Touch
         for filename in cfg.get("touch", []):
