@@ -1,6 +1,5 @@
 name: Publish to TestPyPI
 on:
-  pull_request:
   push:
     branches: [main]
 jobs:
@@ -14,12 +13,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Install Poetry
+      - name: Install poetry
         uses: snok/install-poetry@v1
-      - name: Bump to a dev version
+      - name: Bump version
         run: |
           poetry version $(poetry version -s).post$(date "+%Y%m%d%H%M")
-      - name: Build and Publish to TestPyPI
+      - name: Build and publish
         uses: JRubics/poetry-publish@v1.6
         with:
           pypi_token: ${{ secrets.TEST_PYPI_TOKEN }}
