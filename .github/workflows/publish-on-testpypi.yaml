@@ -18,8 +18,7 @@ jobs:
         uses: snok/install-poetry@v1
       - name: Bump to a dev version
         run: |
-          poetry version patch
-          poetry version $(poetry version -s).dev$(date "+%Y%m%d%H%M")
+          poetry version $(poetry version -s).post$(date "+%Y%m%d%H%M")
       - name: Build and Publish to TestPyPI
         uses: JRubics/poetry-publish@v1.6
         with:
