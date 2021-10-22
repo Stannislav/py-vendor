@@ -53,16 +53,16 @@ def version():
 
 
 @main.command()
-@click.option("-c", "--config", help="The path of the config file.")
+@click.option("-c", "--config", "config_path", help="The path of the config file.")
 @click.option("-n", "--name", default=None, help="The name of the vendor to pull")
 @click.option("-f", "--force", is_flag=True)
-def run(config: str, name: str | None, force: bool):
-    with open(config) as fh:
-        config = yaml.safe_load(fh.read())
+def run(config_path: str, name: str | None, force: bool):
+    with open(config_path) as fh:
+        config_path = yaml.safe_load(fh.read())
 
-    vendor_dir = config["params"]["vendor_dir"]
+    vendor_dir = config_path["params"]["vendor_dir"]
     echo_pair(f"Target dir", vendor_dir)
-    for vendor_name, cfg in config["vendors"].items():
+    for vendor_name, cfg in config_path["vendors"].items():
         if name is not None and vendor_name != name:
             continue
         url = cfg.get("url")
