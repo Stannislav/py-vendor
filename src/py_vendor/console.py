@@ -36,7 +36,7 @@ def echo_pair(key, value):
     "-v",
     "--verbose",
     count=True,
-    help="The logging verbosity: 0=WARNING (default), 1=INFO, 2=DEBUG"
+    help="The logging verbosity: 0=WARNING (default), 1=INFO, 2=DEBUG",
 )
 def main(verbose):
     if verbose >= 2:
@@ -53,15 +53,25 @@ def version():
 
 
 @main.command()
-@click.option("-c", "--config", "config_path", help="The path of the config file.")
-@click.option("-n", "--name", default=None, help="The name of the vendor to pull")
+@click.option(
+    "-c",
+    "--config",
+    "config_path",
+    help="The path of the config file.",
+)
+@click.option(
+    "-n",
+    "--name",
+    default=None,
+    help="The name of the vendor to pull",
+)
 @click.option("-f", "--force", is_flag=True)
 def run(config_path: str, name: str | None, force: bool):
     with open(config_path) as fh:
         config_path = yaml.safe_load(fh.read())
 
     vendor_dir = config_path["params"]["vendor_dir"]
-    echo_pair(f"Target dir", vendor_dir)
+    echo_pair("Target dir", vendor_dir)
     for vendor_name, cfg in config_path["vendors"].items():
         if name is not None and vendor_name != name:
             continue
@@ -80,7 +90,7 @@ def run(config_path: str, name: str | None, force: bool):
                 echo_error(
                     f"Target directory {target.resolve().as_uri()} not empty. "
                     "Use the --force option to force overwriting."
-                 )
+                )
                 continue
         do_vendor(url, target, ref, cfg.get("copy"))
 

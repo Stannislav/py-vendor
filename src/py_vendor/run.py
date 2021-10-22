@@ -16,7 +16,7 @@ def clone_repo(url: str, ref: str, target: str | pathlib.Path):
         ["git", "init"],
         ["git", "remote", "add", "origin", url],
         ["git", "fetch", "--depth", "1", "origin", ref],
-        ["git", "reset", "--hard", "FETCH_HEAD"]
+        ["git", "reset", "--hard", "FETCH_HEAD"],
     ]
     for cmd in commands:
         proc = subprocess.run(cmd, **kwargs)
@@ -60,7 +60,12 @@ def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
                     if subs:
                         lines = fh_in.readlines()
                         for pattern, repl in subs:
-                            logger.info('applying sub "%s" ->  "%s" to %s', pattern.pattern, repl, pathdst)
+                            logger.info(
+                                'applying sub "%s" ->  "%s" to %s',
+                                pattern.pattern,
+                                repl,
+                                pathdst,
+                            )
                             lines = [pattern.sub(repl, line) for line in lines]
                         fh_out.writelines(lines)
                     else:
@@ -72,10 +77,7 @@ def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
 
 
 def do_vendor(
-    url: str,
-    dstdir: pathlib.Path,
-    ref: str,
-    files: list[str | dict] | None = None
+    url: str, dstdir: pathlib.Path, ref: str, files: list[str | dict] | None = None
 ):
     with tempfile.TemporaryDirectory() as srcdir:
         clone_repo(url, ref, srcdir)
