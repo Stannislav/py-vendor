@@ -9,8 +9,8 @@ import click
 import yaml
 
 import py_vendor
-from py_vendor.run import clone_repo, copy, create, modify
 from py_vendor import shell
+from py_vendor.run import clone_repo, copy, create, modify
 
 logger = logging.getLogger(__name__)
 

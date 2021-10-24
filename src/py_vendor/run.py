@@ -30,10 +30,10 @@ def clone_repo(url: str, ref: str, target: str | pathlib.Path):
 
 
 def apply_header_subs(
-        header: str | None,
-        subs: Iterable[tuple[str, str]] | None,
-        srcpath: str | pathlib.Path,
-        dstpath: str | pathlib.Path,
+    header: str | None,
+    subs: Iterable[tuple[str, str]] | None,
+    srcpath: str | pathlib.Path,
+    dstpath: str | pathlib.Path,
 ) -> None:
     with open(srcpath) as fh_in, open(dstpath, "w") as fh_out:
         if header:
@@ -96,9 +96,9 @@ def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
 
 
 def copy(
-        files: list[str | dict] | None,
-        srcdir: pathlib.Path,
-        dstdir: pathlib.Path,
+    files: list[str | dict] | None,
+    srcdir: pathlib.Path,
+    dstdir: pathlib.Path,
 ) -> None:
     if files is None:
         logger.info("no files specified, copying everything to %s", dstdir)
