@@ -3,12 +3,13 @@ from __future__ import annotations
 import logging
 import pathlib
 import shutil
+import tempfile
 
 import click
 import yaml
 
 import py_vendor
-from py_vendor.run import do_vendor
+from py_vendor.run import clone_repo, copy
 from py_vendor import shell
 
 logger = logging.getLogger(__name__)
@@ -61,25 +62,29 @@ def run(config_path: str, name: str | None, force: bool):
         url = cfg.get("url")
         ref = cfg.get("ref")
         shell.echo_pair("Vendoring", f"{vendor_name} {url} @ {ref}")
-        target = pathlib.Path(vendor_dir, vendor_name)
-        if target.exists():
+        dstdir = pathlib.Path(vendor_dir, vendor_name)
+        if dstdir.exists():
             if force:
                 shell.echo_warning(
-                    f"Removing the directory {target.resolve().as_uri()} "
+                    f"Removing the directory {dstdir.resolve().as_uri()} "
                     f"(--force option present)"
                 )
-                shutil.rmtree(target)
+                shutil.rmtree(dstdir)
             else:
                 shell.echo_error(
-                    f"Target directory {target.resolve().as_uri()} not empty. "
+                    f"Target directory {dstdir.resolve().as_uri()} not empty. "
                     "Use the --force option to force overwriting."
                 )
                 continue
-        do_vendor(url, target, ref, cfg.get("copy"))
 
-        # Touch
+        # Clone repo & copy files
+        with tempfile.TemporaryDirectory() as srcdir:
+            clone_repo(url, ref, srcdir)
+            copy(cfg.get("copy"), pathlib.Path(srcdir), dstdir)
+
+        # Create
         for filename in cfg.get("create", []):
-            path = target / filename
+            path = dstdir / filename
             logger.info("creating %s", path)
             path.parent.mkdir(exist_ok=True, parents=True)
             path.touch()

@@ -76,15 +76,15 @@ def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
                 shutil.copy2(path, pathdst)
 
 
-def do_vendor(
-    url: str, dstdir: pathlib.Path, ref: str, files: list[str | dict] | None = None
-):
-    with tempfile.TemporaryDirectory() as srcdir:
-        clone_repo(url, ref, srcdir)
-        if files is None:
-            logger.info("no files specified, copying everything to %s", dstdir)
-            shutil.copytree(srcdir, dstdir)
-        else:
-            dstdir.mkdir()
-            for item in files:
-                copy_item(item, pathlib.Path(srcdir), dstdir)
+def copy(
+        files: list[str | dict] | None,
+        srcdir: pathlib.Path,
+        dstdir: pathlib.Path,
+) -> None:
+    if files is None:
+        logger.info("no files specified, copying everything to %s", dstdir)
+        shutil.copytree(srcdir, dstdir)
+    else:
+        dstdir.mkdir()
+        for item in files:
+            copy_item(item, srcdir, dstdir)
