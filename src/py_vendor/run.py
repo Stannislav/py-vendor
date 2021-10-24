@@ -56,19 +56,13 @@ def apply_header_subs(
     shutil.copymode(srcpath, srcpath)
 
 
-def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
-    if isinstance(item, dict):
-        pattern = item.get("pattern")
-        target_str = item.get("dest", "")
-        rel_dir = item.get("relative_to", "")
-        header = item.get("header")
-        subs = item.get("subs")
-    else:
-        pattern = item
-        target_str = ""
-        rel_dir = ""
-        header = None
-        subs = None
+def copy_item(item: dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
+    pattern = item.get("pattern")
+    target_str = item.get("dest", "")
+    rel_dir = item.get("relative_to", "")
+    header = item.get("header")
+    subs = item.get("subs")
+
     logger.debug("header: %s", header)
     logger.debug("subs: %s", subs)
     target = dstdir / target_str
@@ -96,17 +90,23 @@ def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
 
 
 def copy(
-    files: list[str | dict] | None,
+    items: list[str | dict] | None,
     srcdir: pathlib.Path,
     dstdir: pathlib.Path,
 ) -> None:
-    if files is None:
+    if items is None:
         logger.info("no files specified, copying everything to %s", dstdir)
         shutil.copytree(srcdir, dstdir)
     else:
         dstdir.mkdir()
-        for item in files:
-            copy_item(item, srcdir, dstdir)
+        for item in items:
+            if isinstance(item, str):
+                copy_item({"pattern": item}, srcdir, dstdir)
+            else:  # type(item) = dict
+                if not item.get("pattern"):
+                    logger.error('The required directive "pattern" is missing')
+                    continue
+                copy_item(item, srcdir, dstdir)
 
 
 def modify_item(item: dict, dstdir: pathlib.Path) -> None:
