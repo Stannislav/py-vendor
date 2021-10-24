@@ -5,6 +5,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import tempfile
 from typing import Iterable
 
 logger = logging.getLogger(__name__)
@@ -71,7 +72,13 @@ def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
     logger.debug("header: %s", header)
     logger.debug("subs: %s", subs)
     target = dstdir / target_str
-    for srcpath in srcdir.glob(pattern):
+
+    srcpaths = list(srcdir.glob(pattern))
+    if not srcpaths:
+        logger.warning(f'The pattern "{pattern}" gave no results')
+        return
+
+    for srcpath in srcpaths:
         dstpath = target / srcpath.relative_to(srcdir).relative_to(rel_dir)
         logger.info(f"copying {srcpath.relative_to(srcdir)} to {dstpath}")
         if srcpath.is_dir():
@@ -102,10 +109,42 @@ def copy(
             copy_item(item, srcdir, dstdir)
 
 
-def modify_item(item: dict, dstdir: pathlib.Path):
+def modify_item(item: dict, dstdir: pathlib.Path) -> None:
     pattern = item.get("pattern")
     header = item.get("header")
     subs = item.get("subs", [])
+
+    if not header and not subs:
+        logger.warning("no header nor subs provided, nothing to modify")
+        return
+
+    dstpaths = list(dstdir.glob(pattern))
+    if not dstpaths:
+        logger.warning(f'The pattern "{pattern}" gave no results')
+        return
+
+    if all(dstpath.is_dir() for dstpath in dstpaths):
+        logger.warning(f'The pattern "{pattern}" matched only directories')
+
+    with tempfile.TemporaryDirectory() as tempdir_s:
+        tempdir = pathlib.Path(tempdir_s)
+        for dstpath in dstpaths:
+            # Check if dstpath is a directory
+            if dstpath.is_dir():
+                logger.warning(
+                    "Can't modify a directory (%s, matched by %s), skipping",
+                    dstpath,
+                    pattern,
+                )
+                continue
+
+            # Copy the current file to a temporary location
+            srcpath = tempdir / dstpath.relative_to(dstdir)
+            srcpath.parent.mkdir(exist_ok=True, parents=True)
+            shutil.copy2(dstpath, srcpath)
+
+            # Copy the file back while apply all modifications
+            apply_header_subs(header, subs, srcpath, dstpath)
 
 
 def modify(items: Iterable[dict] | None, dstdir: pathlib.Path):
