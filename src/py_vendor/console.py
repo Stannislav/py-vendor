@@ -9,26 +9,9 @@ import yaml
 
 import py_vendor
 from py_vendor.run import do_vendor
+from py_vendor import shell
 
 logger = logging.getLogger(__name__)
-
-
-def echo(msg):
-    click.secho(msg, fg="blue")
-
-
-def echo_warning(msg):
-    click.secho(msg, fg="yellow")
-
-
-def echo_error(msg):
-    click.secho(msg, fg="red")
-
-
-def echo_pair(key, value):
-    click.secho(key, fg="blue", nl=False)
-    click.echo(": ", nl=False)
-    click.secho(value, fg="green")
 
 
 @click.group()
@@ -49,7 +32,7 @@ def main(verbose):
 
 @main.command()
 def version():
-    echo_pair("Version", py_vendor.__version__)
+    shell.echo_pair("Version", py_vendor.__version__)
 
 
 @main.command()
@@ -71,23 +54,23 @@ def run(config_path: str, name: str | None, force: bool):
         config_path = yaml.safe_load(fh.read())
 
     vendor_dir = config_path["params"]["vendor_dir"]
-    echo_pair("Target dir", vendor_dir)
+    shell.echo_pair("Target dir", vendor_dir)
     for vendor_name, cfg in config_path["vendors"].items():
         if name is not None and vendor_name != name:
             continue
         url = cfg.get("url")
         ref = cfg.get("ref")
-        echo_pair("Vendoring", f"{vendor_name} {url} @ {ref}")
+        shell.echo_pair("Vendoring", f"{vendor_name} {url} @ {ref}")
         target = pathlib.Path(vendor_dir, vendor_name)
         if target.exists():
             if force:
-                echo_warning(
+                shell.echo_warning(
                     f"Removing the directory {target.resolve().as_uri()} "
                     f"(--force option present)"
                 )
                 shutil.rmtree(target)
             else:
-                echo_error(
+                shell.echo_error(
                     f"Target directory {target.resolve().as_uri()} not empty. "
                     "Use the --force option to force overwriting."
                 )
@@ -101,4 +84,4 @@ def run(config_path: str, name: str | None, force: bool):
             path.parent.mkdir(exist_ok=True, parents=True)
             path.touch()
 
-    echo("Done.")
+    shell.echo("Done.")
