@@ -28,52 +28,64 @@ def clone_repo(url: str, ref: str, target: str | pathlib.Path):
             logger.debug(stderr)
 
 
+def apply_header_subs(
+        header: str | None,
+        subs: Iterable[tuple[str, str]] | None,
+        srcpath: str | pathlib.Path,
+        dstpath: str | pathlib.Path,
+) -> None:
+    with open(srcpath) as fh_in, open(dstpath, "w") as fh_out:
+        if header:
+            fh_out.write(header)
+        if subs:
+            lines = fh_in.readlines()
+            for pattern, replacement in subs:
+                pattern_c = re.compile(pattern)
+                logger.info(
+                    'applying sub "%s" ->  "%s" to %s',
+                    pattern,
+                    replacement,
+                    dstpath,
+                )
+                lines = [pattern_c.sub(replacement, line) for line in lines]
+            fh_out.writelines(lines)
+        else:
+            # maybe faster than writing line-by-line
+            fh_out.write(fh_in.read())
+    shutil.copymode(srcpath, srcpath)
+
+
 def copy_item(item: str | dict, srcdir: pathlib.Path, dstdir: pathlib.Path):
     if isinstance(item, dict):
         pattern = item.get("pattern")
         target_str = item.get("dest", "")
         rel_dir = item.get("relative_to", "")
-        header = item.get("header", "")
-        subs = [(re.compile(pattern), repl) for pattern, repl in item.get("subs", [])]
+        header = item.get("header")
+        subs = item.get("subs")
     else:
         pattern = item
         target_str = ""
         rel_dir = ""
-        header = ""
-        subs = []
-    logger.debug("header:\n%s", header)
-    logger.debug("subs:\n%s", "".join(map(str, subs)))
+        header = None
+        subs = None
+    logger.debug("header: %s", header)
+    logger.debug("subs: %s", subs)
     target = dstdir / target_str
-    for path in srcdir.glob(pattern):
-        pathdst = target / path.relative_to(srcdir).relative_to(rel_dir)
-        logger.info(f"copying {path.relative_to(srcdir)} to {pathdst}")
-        if path.is_dir():
+    for srcpath in srcdir.glob(pattern):
+        dstpath = target / srcpath.relative_to(srcdir).relative_to(rel_dir)
+        logger.info(f"copying {srcpath.relative_to(srcdir)} to {dstpath}")
+        if srcpath.is_dir():
             if header:
-                logging.warning("header ignored for directory: %s", path)
-            shutil.copytree(path, pathdst)
+                logging.warning("header ignored for directory: %s", srcpath)
+            if subs:
+                logging.warning("subs ignored for directory: %s", srcpath)
+            shutil.copytree(srcpath, dstpath)
         else:
-            pathdst.parent.mkdir(parents=True, exist_ok=True)
+            dstpath.parent.mkdir(parents=True, exist_ok=True)
             if header or subs:
-                with open(path) as fh_in, open(pathdst, "w") as fh_out:
-                    if header:
-                        fh_out.write(header)
-                    if subs:
-                        lines = fh_in.readlines()
-                        for pattern, repl in subs:
-                            logger.info(
-                                'applying sub "%s" ->  "%s" to %s',
-                                pattern.pattern,
-                                repl,
-                                pathdst,
-                            )
-                            lines = [pattern.sub(repl, line) for line in lines]
-                        fh_out.writelines(lines)
-                    else:
-                        # maybe faster than writing line-by-line
-                        fh_out.write(fh_in.read())
-                shutil.copymode(path, pathdst)
+                apply_header_subs(header, subs, srcpath, dstpath)
             else:
-                shutil.copy2(path, pathdst)
+                shutil.copy2(srcpath, dstpath)
 
 
 def copy(
@@ -90,13 +102,24 @@ def copy(
             copy_item(item, srcdir, dstdir)
 
 
-def modify(files: Iterable[str] | None, dstdir: pathlib.Path):
-    if files is None:
+def modify_item(item: dict, dstdir: pathlib.Path):
+    pattern = item.get("pattern")
+    header = item.get("header")
+    subs = item.get("subs", [])
+
+
+def modify(items: Iterable[dict] | None, dstdir: pathlib.Path):
+    if items is None:
+        logger.info("no files to modify")
         return
+
+    for item in items:
+        modify_item(item, dstdir)
 
 
 def create(files: Iterable[str] | None, dstdir: pathlib.Path):
     if files is None:
+        logger.info("no files to create")
         return
 
     for filename in files:
