@@ -9,7 +9,7 @@ import click
 import yaml
 
 import py_vendor
-from py_vendor.run import clone_repo, copy
+from py_vendor.run import clone_repo, copy, create
 from py_vendor import shell
 
 logger = logging.getLogger(__name__)
@@ -83,10 +83,6 @@ def run(config_path: str, name: str | None, force: bool):
             copy(cfg.get("copy"), pathlib.Path(srcdir), dstdir)
 
         # Create
-        for filename in cfg.get("create", []):
-            path = dstdir / filename
-            logger.info("creating %s", path)
-            path.parent.mkdir(exist_ok=True, parents=True)
-            path.touch()
+        create(cfg.get("create", []), dstdir)
 
     shell.echo("Done.")

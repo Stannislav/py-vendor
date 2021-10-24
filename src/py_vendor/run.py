@@ -5,7 +5,7 @@ import pathlib
 import re
 import shutil
 import subprocess
-import tempfile
+from typing import Iterable
 
 logger = logging.getLogger(__name__)
 
@@ -88,3 +88,11 @@ def copy(
         dstdir.mkdir()
         for item in files:
             copy_item(item, srcdir, dstdir)
+
+
+def create(files: Iterable[str], dstdir: pathlib.Path):
+    for filename in files:
+        path = dstdir / filename
+        logger.info("creating %s", path)
+        path.parent.mkdir(exist_ok=True, parents=True)
+        path.touch()
