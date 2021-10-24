@@ -9,7 +9,7 @@ import click
 import yaml
 
 import py_vendor
-from py_vendor.run import clone_repo, copy, create
+from py_vendor.run import clone_repo, copy, create, modify
 from py_vendor import shell
 
 logger = logging.getLogger(__name__)
@@ -82,7 +82,10 @@ def run(config_path: str, name: str | None, force: bool):
             clone_repo(url, ref, srcdir)
             copy(cfg.get("copy"), pathlib.Path(srcdir), dstdir)
 
+        # Modify
+        modify(cfg.get("modify"), dstdir)
+
         # Create
-        create(cfg.get("create", []), dstdir)
+        create(cfg.get("create"), dstdir)
 
     shell.echo("Done.")

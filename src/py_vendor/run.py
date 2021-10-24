@@ -90,7 +90,15 @@ def copy(
             copy_item(item, srcdir, dstdir)
 
 
-def create(files: Iterable[str], dstdir: pathlib.Path):
+def modify(files: Iterable[str] | None, dstdir: pathlib.Path):
+    if files is None:
+        return
+
+
+def create(files: Iterable[str] | None, dstdir: pathlib.Path):
+    if files is None:
+        return
+
     for filename in files:
         path = dstdir / filename
         logger.info("creating %s", path)
