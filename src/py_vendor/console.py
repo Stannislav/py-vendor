@@ -78,9 +78,9 @@ def run(config_path: str, name: str | None, force: bool):
         do_vendor(url, target, ref, cfg.get("copy"))
 
         # Touch
-        for filename in cfg.get("touch", []):
+        for filename in cfg.get("create", []):
             path = target / filename
-            logger.info("touching %s", path)
+            logger.info("creating %s", path)
             path.parent.mkdir(exist_ok=True, parents=True)
             path.touch()
 
