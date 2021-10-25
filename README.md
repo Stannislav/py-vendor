@@ -1,5 +1,5 @@
 # py-vendor
-[Install](#install)  [Use](#use) - [Examples](#examples) -
+[Install](#install) - [Use](#use) - [Examples](#examples) -
 [Config File](#config-file) - [Contribute](#contribute)
 
 Easy, configurable, and reproducible code vendors.
