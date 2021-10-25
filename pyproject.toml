@@ -6,9 +6,9 @@ license = "MIT"
 authors = ["Stanislav Schmidt <stanislav.schmidt@outlook.com>"]
 maintainers = ["Stanislav Schmidt <stanislav.schmidt@outlook.com>"]
 readme = "README.md"
-homepage = "https://test.pypi.org/project/py-vendor"
+homepage = "https://pypi.org/project/py-vendor"
 repository = "https://github.com/Stannislav/py-vendor"
-documentation = "https://test.pypi.org/project/py-vendor"
+documentation = "https://pypi.org/project/py-vendor"
 keywords = ["vendor", "open-source"]
 classifiers = [
     "Intended Audience :: Developers",
