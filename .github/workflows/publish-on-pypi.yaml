@@ -10,6 +10,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build and publish
-        uses: JRubics/poetry-publish@v1
+        uses: JRubics/poetry-publish@v1.6
         with:
           pypi_token: ${{ secrets.PYPI_TOKEN }}
