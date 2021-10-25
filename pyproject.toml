@@ -1,8 +1,30 @@
 [tool.poetry]
 name = "py-vendor"
 version = "0.1.2"
-description = "Easily vendor code into your project"
+description = "Easy, configurable, and reproducible code vendors"
+license = "MIT"
 authors = ["Stanislav Schmidt <stanislav.schmidt@outlook.com>"]
+maintainers = ["Stanislav Schmidt <stanislav.schmidt@outlook.com>"]
+readme = "README.md"
+homepage = "https://test.pypi.org/project/py-vendor"
+repository = "https://github.com/Stannislav/py-vendor"
+documentation = "https://test.pypi.org/project/py-vendor"
+keywords = ["vendor", "open-source"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -13,9 +35,9 @@ PyYAML = "^6.0"
 pytest = "^5.2"
 tox = "^3.24.4"
 
+[tool.poetry.scripts]
+py-vendor = "py_vendor.console:main"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-py-vendor = "py_vendor.console:main"
