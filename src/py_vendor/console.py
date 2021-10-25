@@ -54,7 +54,8 @@ def run(config_path: str, name: str | None, force: bool):
     with open(config_path) as fh:
         config_path = yaml.safe_load(fh.read())
 
-    vendor_dir = config_path["params"]["vendor_dir"]
+    vendor_dir = pathlib.Path(config_path["params"]["vendor_dir"])
+    vendor_dir.mkdir(exist_ok=True, parents=True)
     shell.echo_pair("Target dir", vendor_dir)
     for vendor_name, cfg in config_path["vendors"].items():
         if name is not None and vendor_name != name:
@@ -62,7 +63,7 @@ def run(config_path: str, name: str | None, force: bool):
         url = cfg.get("url")
         ref = cfg.get("ref")
         shell.echo_pair("Vendoring", f"{vendor_name} {url} @ {ref}")
-        dstdir = pathlib.Path(vendor_dir, vendor_name)
+        dstdir = vendor_dir / vendor_name
         if dstdir.exists():
             if force:
                 shell.echo_warning(
