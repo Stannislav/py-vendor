@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-vendor"
-version = "0.1.1"
+version = "0.1.2"
 description = "Easily vendor code into your project"
 authors = ["Stanislav Schmidt <stanislav.schmidt@outlook.com>"]
 
