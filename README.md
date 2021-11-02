@@ -7,7 +7,7 @@ Easy, configurable, and reproducible code vendors.
 ## Install
 All package releases are available on PyPI and can be installed using `pip`:
 ```shell
-pip instal py-vendor
+pip install py-vendor
 ```
 
 ## Use
